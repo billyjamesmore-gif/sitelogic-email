@@ -1,0 +1,43 @@
+{
+  "name": "@sitelogic-ai/email",
+  "version": "0.1.0",
+  "description": "Shared transactional email package for SiteLogic products (Weather-Logix, Tidy Site, Project Flow). Resend + React Email, branded per-product at runtime.",
+  "license": "UNLICENSED",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "preview": "email dev --dir ./src/templates --port 3010",
+    "prepare": "npm run build"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "dependencies": {
+    "@react-email/components": "^0.0.32",
+    "resend": "^4.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.16.11",
+    "@types/react": "^18.3.11",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-email": "^3.0.4",
+    "tsup": "^8.3.5",
+    "typescript": "^5.6.3"
+  }
+}
