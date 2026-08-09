@@ -27,17 +27,33 @@ coupled to any single app.
 ## Install (from private GitHub repo)
 
 The package lives in its own private repo. Install it in each product pinned to a
-tag or commit:
+commit. The repo is **public** (it contains no secrets — every credential is a
+runtime env var), so no auth/token is needed to install.
 
-```sh
-npm install github:sitelogic-ai/email#v0.1.0
-# or git+ssh, pinned to a commit:
-npm install git+ssh://git@github.com:sitelogic-ai/email.git#<commit-sha>
+Add this to the consuming app's `package.json` dependencies — **use the
+`git+https` URL, not the `github:` shorthand** (see gotchas below):
+
+```json
+"@sitelogic-ai/email": "git+https://github.com/billyjamesmore-gif/sitelogic-email.git"
 ```
 
-> **Upgrade path:** once you're iterating on templates often, publish to
-> **GitHub Packages** (private npm registry) for clean semver instead of git
-> refs. Not needed to start — git installs are the lowest-friction path.
+Then `npm install`. The package's `prepare` script builds `dist/` automatically
+on install.
+
+### ⚠️ Two install gotchas (learned the hard way — Vercel will fail without these)
+
+1. **Do NOT use the `github:owner/repo` shorthand.** npm resolves it to a
+   `git+ssh://` URL, and Vercel's build environment has no SSH key → clone fails
+   with `npm error code 128`. Always use the full `git+https://…​.git` form.
+2. **npm still rewrites the lockfile `resolved` field to `git+ssh://` anyway.**
+   After `npm install`, open `package-lock.json`, find the `"resolved"` line for
+   `@sitelogic-ai/email`, and if it starts `git+ssh://git@github.com/…`, change it
+   to `git+https://github.com/…`. Then run `npm ci` (what Vercel runs) to confirm
+   it installs clean from the lockfile. Commit the fixed lockfile.
+
+> **Upgrade path:** once you're iterating on templates often, publish to a real
+> npm registry (npmjs or GitHub Packages) for clean semver instead of git refs.
+> Not needed to start.
 
 ## Per-product setup
 
@@ -74,18 +90,32 @@ npm install git+ssh://git@github.com:sitelogic-ai/email.git#<commit-sha>
 
 ## Adding this to Tidy Site and Project Flow
 
-Do the same three steps in each repo — the **only** things that change are the
-brand block and from address. Install the package
-(`npm install github:sitelogic-ai/email#<tag>`), set `RESEND_API_KEY` in that
-repo's env + Vercel, and add a `lib/email.ts` whose `createEmailClient({ brand })`
-uses that product's identity: for **Tidy Site** →
-`{ productName: "Tidy Site", fromAddress: "tidysite@send.sitelogic-ai.com",
-primaryColor: "#f97316", baseUrl: "https://tidysite.vercel.app", supportEmail:
-"support@sitelogic-ai.com" }`; for **Project Flow** →
-`{ productName: "Project Flow", fromAddress: "projectflow@send.sitelogic-ai.com",
-primaryColor: "#f97316", baseUrl: "https://plotflow-five.vercel.app",
-supportEmail: "support@sitelogic-ai.com" }`. Then call `email.sendWelcome(...)`
-etc. exactly as in Weather-Logix — same API, product-specific branding and sender.
+Same steps as Weather-Logix — the **only** things that change are the brand block
+and from address. **Note:** both apps already have their own email code; add this
+package *alongside* it (create `lib/sitelogic-email.ts` so you don't clobber an
+existing `lib/email.ts`) and migrate existing sends later — don't tear out
+working code.
+
+1. Install (see install section + the two gotchas above):
+   `"@sitelogic-ai/email": "git+https://github.com/billyjamesmore-gif/sitelogic-email.git"`
+   then fix the lockfile `resolved` → `git+https`, `npm ci`.
+2. Set `RESEND_API_KEY` (shared umbrella key) + `RESEND_DOMAIN_VERIFIED=true` in
+   that repo's Vercel project. No `RESEND_FROM` needed — it comes from the brand.
+3. Add `lib/sitelogic-email.ts` with `createEmailClient({ brand })` using that
+   product's identity:
+
+   - **Tidy Site:** `{ productName: "Tidy Site", fromAddress:
+     "tidysite@send.sitelogic-ai.com", primaryColor: "#f97316", baseUrl:
+     "https://tidysite.vercel.app", supportEmail: "support@sitelogic-ai.com" }`
+   - **Project Flow:** `{ productName: "Project Flow", fromAddress:
+     "projectflow@send.sitelogic-ai.com", primaryColor: "#f97316", baseUrl:
+     "https://plotflow-five.vercel.app", supportEmail: "support@sitelogic-ai.com" }`
+
+4. Call `sitelogicEmail.sendWelcome({ to })` (or `sendReport` / `sendReceipt` /
+   `sendAlert`) from a server route/action — same typed API as Weather-Logix.
+
+All three products share the one verified domain `send.sitelogic-ai.com` and one
+umbrella Resend account; only the from-address and brand differ per product.
 
 ## Local development
 
