@@ -55,7 +55,7 @@ export function AlertEmail({
 
 AlertEmail.PreviewProps = {
   brand: {
-    productName: "Tidy Site",
+    productName: "TidySite",
     fromAddress: "tidysite@send.sitelogic-ai.com",
     supportEmail: "support@sitelogic-ai.com",
     primaryColor: "#f97316",
