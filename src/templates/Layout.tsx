@@ -57,7 +57,8 @@ export function Layout({
           }}
         >
           {/* Header */}
-          <Section style={{ backgroundColor: "#0e1520", padding: "22px 28px" }}>
+          {/* Brand deep navy (brand/BRAND.md, D-16a). */}
+          <Section style={{ backgroundColor: "#17222F", padding: "22px 28px" }}>
             {brand.logoUrl ? (
               <Img
                 src={brand.logoUrl}
@@ -75,7 +76,7 @@ export function Layout({
                       height: 30,
                       borderRadius: 7,
                       textAlign: "center" as const,
-                      color: "#fff",
+                      color: "#17222F",
                       fontWeight: 700,
                       fontSize: 15,
                     }}
@@ -178,7 +179,8 @@ export function Button({
       href={href}
       style={{
         backgroundColor: color,
-        color: "#ffffff",
+        // Navy text: white on the brand orange fails contrast (2.8:1 vs 5.7:1).
+        color: "#17222F",
         textDecoration: "none",
         fontWeight: 600,
         fontSize: 14,
