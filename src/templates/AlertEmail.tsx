@@ -13,6 +13,19 @@ const TONE: Record<
   danger: { bg: "rgba(220,38,38,0.12)", fg: "#b91c1c", label: "Alert" },
 };
 
+/**
+ * The body keeps its line breaks: a blank line starts a new paragraph and a
+ * single line break becomes a <br />. A body without line breaks renders
+ * exactly as before (one paragraph).
+ */
+export function bodyParagraphs(body: string): string[][] {
+  return body
+    .replace(/\r\n?/g, "\n")
+    .split(/\n{2,}/)
+    .map((p) => p.split("\n").map((l) => l.trimEnd()))
+    .filter((lines) => lines.some((l) => l.trim()));
+}
+
 export function AlertEmail({
   brand,
   props,
@@ -41,7 +54,16 @@ export function AlertEmail({
         </span>
       </Section>
       <Heading>{props.title}</Heading>
-      <Paragraph>{props.body}</Paragraph>
+      {bodyParagraphs(props.body).map((lines, i) => (
+        <Paragraph key={i}>
+          {lines.map((line, j) => (
+            <React.Fragment key={j}>
+              {j ? <br /> : null}
+              {line}
+            </React.Fragment>
+          ))}
+        </Paragraph>
+      ))}
       {props.ctaUrl ? (
         <Section style={{ padding: "2px 0 18px" }}>
           <Button href={props.ctaUrl} color={brand.primaryColor}>
