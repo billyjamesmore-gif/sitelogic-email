@@ -1,6 +1,6 @@
 {
   "name": "@sitelogic-ai/email",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Shared transactional email package for SiteLogic products (Weather-Logix, Tidy Site, Project Flow). Resend + React Email, branded per-product at runtime.",
   "license": "UNLICENSED",
   "private": true,
