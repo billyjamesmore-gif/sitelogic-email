@@ -26,10 +26,13 @@ const surface = "#ffffff";
 export function Layout({
   brand,
   preview,
+  note,
   children,
 }: {
   brand: BrandConfig;
   preview: string;
+  /** Optional extra footer line (MessageEmail's footerNote). */
+  note?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -114,6 +117,12 @@ export function Layout({
                 margin: 0,
               }}
             >
+              {note ? (
+                <>
+                  {note}
+                  <br />
+                </>
+              ) : null}
               {brand.productName} ·{" "}
               <Link
                 href={brand.baseUrl}

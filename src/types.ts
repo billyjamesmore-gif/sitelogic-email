@@ -91,6 +91,36 @@ export interface ReceiptProps extends BaseSend {
   manageUrl?: string;
 }
 
+/** A general message (EM-03): invitations, account and billing emails, formal notices. */
+export interface MessageProps extends BaseSend {
+  /** Heading. */
+  title: string;
+  /** Body text: a blank line starts a new paragraph, a line break is kept. */
+  body: string;
+  /** Inbox preview text (defaults to the title). */
+  preview?: string;
+  /** A coloured line above the heading, e.g. "This is a reminder." */
+  notice?: { text: string; tone?: "info" | "warning" | "danger" };
+  /** A highlighted label + value, e.g. Deadline. */
+  highlight?: { label: string; value: string };
+  /** A quoted personal message. */
+  quote?: { text: string; by?: string };
+  /** The main button, with an optional note under it. */
+  cta?: { label: string; url: string; note?: string };
+  /** A quieter second button, with an optional note under it. */
+  secondary?: { label: string; url: string; note?: string };
+  /** Closing lines, e.g. "Thanks,\nThe SiteLogic team". */
+  signoff?: string;
+  /** An extra footer line: why they're getting this email. */
+  footerNote?: string;
+  /** Reply-to (defaults to the brand's support address). */
+  replyTo?: string;
+  /** Full From header, overriding the brand's ("Name <address>"). */
+  from?: string;
+  /** Attachments, content base64-encoded. */
+  attachments?: { filename: string; content: string }[];
+}
+
 export interface AlertProps extends BaseSend {
   /** Heading of the alert. */
   title: string;

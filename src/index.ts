@@ -13,6 +13,7 @@ export type {
   ReportProps,
   ReceiptProps,
   AlertProps,
+  MessageProps,
 } from "./types";
 
 // Templates are exported too, so consumers (or the react-email preview server)
@@ -21,3 +22,4 @@ export { WelcomeEmail } from "./templates/WelcomeEmail";
 export { ReportEmail } from "./templates/ReportEmail";
 export { ReceiptEmail } from "./templates/ReceiptEmail";
 export { AlertEmail } from "./templates/AlertEmail";
+export { MessageEmail } from "./templates/MessageEmail";

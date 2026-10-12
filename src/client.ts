@@ -3,6 +3,7 @@ import { Resend } from "resend";
 import * as React from "react";
 import type {
   AlertProps,
+  MessageProps,
   BrandConfig,
   DryRunInfo,
   EmailClientConfig,
@@ -15,6 +16,7 @@ import { WelcomeEmail } from "./templates/WelcomeEmail";
 import { ReportEmail } from "./templates/ReportEmail";
 import { ReceiptEmail } from "./templates/ReceiptEmail";
 import { AlertEmail } from "./templates/AlertEmail";
+import { MessageEmail } from "./templates/MessageEmail";
 
 function requireBrand(brand: BrandConfig): void {
   const missing = (["productName", "fromAddress", "supportEmail", "primaryColor", "baseUrl"] as const).filter(
@@ -38,12 +40,14 @@ export interface EmailClient {
   sendReport(props: ReportProps): Promise<SendResult>;
   sendReceipt(props: ReceiptProps): Promise<SendResult>;
   sendAlert(props: AlertProps): Promise<SendResult>;
+  /** A general message (EM-03), with optional reply-to, From override and attachments. */
+  sendMessage(props: MessageProps): Promise<SendResult>;
   /** Render a template to HTML without sending (used by preview/tests). */
   render(kind: EmailKind, props: AnyProps): Promise<string>;
 }
 
-type EmailKind = "welcome" | "report" | "receipt" | "alert";
-type AnyProps = WelcomeProps | ReportProps | ReceiptProps | AlertProps;
+type EmailKind = "welcome" | "report" | "receipt" | "alert" | "message";
+type AnyProps = WelcomeProps | ReportProps | ReceiptProps | AlertProps | MessageProps;
 
 export function createEmailClient(config: EmailClientConfig): EmailClient {
   requireBrand(config.brand);
@@ -75,6 +79,8 @@ export function createEmailClient(config: EmailClientConfig): EmailClient {
         return React.createElement(ReceiptEmail, { brand, props: props as ReceiptProps });
       case "alert":
         return React.createElement(AlertEmail, { brand, props: props as AlertProps });
+      case "message":
+        return React.createElement(MessageEmail, { brand, props: props as MessageProps });
     }
   }
 
@@ -114,19 +120,24 @@ export function createEmailClient(config: EmailClientConfig): EmailClient {
       };
     }
 
+    const message = kind === "message" ? (props as MessageProps) : null;
+    const sendFrom = message?.from ?? from;
     if (dryRun || !resend) {
-      emitDryRun({ to: props.to, from, subject: finalSubject, html });
+      emitDryRun({ to: props.to, from: sendFrom, subject: finalSubject, html });
       return { outcome: "dry_run" };
     }
 
     try {
       const { data, error } = await resend.emails.send({
-        from,
+        from: sendFrom,
         to: props.to,
         subject: finalSubject,
         html,
         text,
-        replyTo: config.brand.supportEmail,
+        replyTo: message?.replyTo ?? config.brand.supportEmail,
+        ...(message?.attachments?.length
+          ? { attachments: message.attachments.map((a) => ({ filename: a.filename, content: a.content })) }
+          : {}),
       });
       if (error) {
         // Resend's error message never contains the API key.
@@ -153,6 +164,7 @@ export function createEmailClient(config: EmailClientConfig): EmailClient {
     sendReceipt: (p) =>
       dispatch("receipt", p, `Your ${config.brand.productName} receipt`),
     sendAlert: (p) => dispatch("alert", p, (p as AlertProps).title),
+    sendMessage: (p) => dispatch("message", p, p.title),
     render: renderKind,
   };
 }
