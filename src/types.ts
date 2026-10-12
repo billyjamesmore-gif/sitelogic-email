@@ -7,6 +7,9 @@
 export interface BrandConfig {
   /** Product name shown in email chrome, e.g. "Weather-Logix". */
   productName: string;
+  /** Optional suffix shown after the name in the primary colour, e.g. " AI"
+   *  for the SiteLogic AI wordmark (productName "SiteLogic"). */
+  nameAccent?: string;
   /** From address for this product, e.g. "weatherlogix@send.sitelogic-ai.com".
    *  A display name is added automatically ("Weather-Logix <...>"). */
   fromAddress: string;

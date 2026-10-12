@@ -31,7 +31,7 @@ function requireBrand(brand: BrandConfig): void {
 
 function fromWithName(brand: BrandConfig): string {
   // "Weather-Logix <weatherlogix@send.sitelogic-ai.com>"
-  return `${brand.productName} <${brand.fromAddress}>`;
+  return `${brand.productName}${brand.nameAccent ?? ""} <${brand.fromAddress}>`;
 }
 
 // The client returned by createEmailClient. One instance per product.

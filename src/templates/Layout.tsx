@@ -91,6 +91,9 @@ export function Layout({
                       style={{ color: "#fff", fontWeight: 600, fontSize: 16 }}
                     >
                       {brand.productName}
+                      {brand.nameAccent ? (
+                        <span style={{ color: brand.primaryColor }}>{brand.nameAccent}</span>
+                      ) : null}
                     </span>
                   </td>
                 </tr>
@@ -123,7 +126,7 @@ export function Layout({
                   <br />
                 </>
               ) : null}
-              {brand.productName} ·{" "}
+              {`${brand.productName}${brand.nameAccent ?? ""}`} ·{" "}
               <Link
                 href={brand.baseUrl}
                 style={{ color: inkFaint, textDecoration: "underline" }}
